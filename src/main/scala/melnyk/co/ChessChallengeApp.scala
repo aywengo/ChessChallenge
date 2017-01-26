@@ -1,7 +1,5 @@
 package melnyk.co
 
-import melnyk.co.model._
-
 object ChessChallengeApp extends App {
   val piecesPattern = """^([KQBRN]+)$""".r
   val digitPattern = """^\d$""".r
@@ -11,17 +9,9 @@ object ChessChallengeApp extends App {
       println(s"$m x $n")
       println(pieces)
       val result: Int =
-        Configuration
-          .positions(m.toInt, n.toInt, pieces.toIterable)
-          .map(i => i.map(p => Piece(p._2, p._1._1, p._1._2)).toList)
-          .count(
-            _.combinations(2)
-              .forall {
-                case List(p1, p2) => p1.isInSafe(p2) && p2.isInSafe(p1)
-              })
+        Core.calculate(m.toInt, n.toInt, pieces).count(_.isDefined)
 
       println(result)
-
 
     case _ =>
       println("The expected input is:")
