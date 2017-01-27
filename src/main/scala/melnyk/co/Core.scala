@@ -1,8 +1,47 @@
 package melnyk.co
 
 import melnyk.co.model.Piece
+import scala.annotation.tailrec
 
 object Core {
+  val priority: Seq[Char] = "QRBNK" // the order of calculation of combination
+
+  @tailrec
+  def findUniqueConfigurations(inputMap:Map[Char, Int],
+                               rows: Int, columns: Int,
+                               accum: Iterator[Seq[Piece]] = Iterator.empty,
+                               priority: Seq[Char] = priority): Iterator[Seq[Piece]] =
+    priority.headOption match {
+      case None => // end of calculations
+        accum.filter(_.size == inputMap.values.sum)
+      case Some(piece) if inputMap.contains(piece) =>
+        val accumulator =
+          if (!accum.hasNext) { // first chess piece from priority queue
+            combinePieces(piece, inputMap, rows, columns)
+                .filter(k => checkForSafety(k))
+                .map(Some(_))
+          }
+          else
+            for {
+              accumulated: Seq[Piece] <- accum
+              combined: Seq[Piece] <- combinePieces(piece, inputMap, rows, columns)
+            } yield {
+              if (checkForSafety(combined, accumulated)) Some(accumulated ++ combined)
+              else None
+            }
+        findUniqueConfigurations(inputMap, rows, columns, accumulator.flatten, priority.tail)
+      case _ =>
+        findUniqueConfigurations(inputMap, rows, columns, accum, priority.tail)
+  }
+
+
+  def combinePieces(p: Char, inputMap:Map[Char, Int], rows: Int, columns: Int): Iterator[Seq[Piece]] =
+    if (inputMap.contains(p))
+      generatePairs(rows, columns)
+        .toSeq.combinations(inputMap(p))
+        .map(i => i.map(j => Piece(p, j._1, j._2)))
+    else Iterator.empty
+
 
   // extract all possible coordinates of positions
   def generatePairs(rows: Int, columns: Int): Iterable[(Int,Int)] = {
@@ -12,54 +51,22 @@ object Core {
     } yield (n,m)
   }
 
-  // configuration of board is expressed as sequence of pieces
-  def combineGroups(p: Char, amount: Int, in: Iterable[(Int,Int)]): Iterator[Seq[Piece]] =
-    reduceDangerCombinations (
-      in.toSeq.combinations(amount)
-        .map(i => i.map(j => Piece(p, j._1, j._2)))
-    )
-
-  // reduce combination where pieces are in danger positions to each other
-  def reduceDangerCombinations(in: Iterator[Seq[Piece]]): Iterator[Seq[Piece]] = in.filter(checkForSafety)
-
   // check whether pieces are in danger positions to each other
-  def checkForSafety(in: Seq[Piece]) =
-    in.combinations(2).map(_.toList)
-      .forall {
-        case p1 :: p2 :: Nil => p1.isInSafe(p2) && p2.isInSafe(p1)
-      }
+  @tailrec
+  def checkForSafety(in: Seq[Piece], add: Seq[Piece] = Seq.empty[Piece]): Boolean =
+    in.headOption match {
+      case Some(p1) if add.exists(p => p1.samePosition(p)) || in.tail.exists(p => !p1.isInSafe(p) || !p.isInSafe(p1)) => false
+      case Some(p1) if in.tail.nonEmpty && add.isEmpty => in.tail.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail)
+      case Some(p1) if in.tail.nonEmpty => add.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail, add)
+      case Some(p1) => add.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1))
+      case _ => false
+    }
 
   // parsing of an input parameter
-  def countPieces(input: String) = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
+  def countPieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
 
   // two or more pieces on the same cell
-  def hasConflicts(in: Seq[Piece]) = in.groupBy(k => (k.n, k.m)).size != in.size
+  def hasConflicts(in: Seq[Piece]): Boolean = in.map(k => (k.n, k.m)).distinct.size != in.size
 
-  // return all possible configurations
-  def calculate(rows: Int, columns: Int, input: String) = {
-    val inputMap = countPieces(input)
-
-    def combinePieces(p: Char) = combineGroups(p,
-      inputMap.getOrElse(p, 0),
-      generatePairs(rows, columns))
-
-    def predicate(configuration: Seq[Piece]) =
-      configuration.size == input.length && // check is configuration is consistent
-      !hasConflicts(configuration) &&       // check if every piece has own place
-      checkForSafety(configuration)         // verify whether every piece is in safe
-
-    for {
-      queensCombinations <- combinePieces('Q') // it's supposed that combination of Queens has the lesser value
-      rooksCombinations <- combinePieces('R')
-      bishopsCombinations <- combinePieces('B')
-      knightsCombinations <- combinePieces('N')
-      kingsCombinations <- combinePieces('K')
-    }
-     yield
-       if (predicate(queensCombinations ++ rooksCombinations ++ bishopsCombinations ++ knightsCombinations ++ kingsCombinations))
-        Some(queensCombinations ++ rooksCombinations ++ bishopsCombinations ++ knightsCombinations ++ kingsCombinations)
-      else None
-
-  }
 }
 
