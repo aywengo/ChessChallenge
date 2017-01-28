@@ -1,27 +1,38 @@
 package melnyk.co
 
-import melnyk.co.model.Piece
+import melnyk.co.model.{Board, Piece}
+
+import scala.annotation.tailrec
+import scala.concurrent.duration._
 
 object ChessChallengeApp extends App {
-  val inputPattern = """(\d+)\s*(\d+)\s*([KQBRN]+)""".r
+  val inputPattern = """(\d+)\s*(\d+)\s*([KQBRN]+)\s*(\d*)?\s*([KQBRN]{5})?""".r
 
   args.mkString(" ") match {
-    case inputPattern(m, n, pieces) =>
-      println(s"$m x $n")
-      println(pieces)
-      time {
-        val t: Int = Core
-          .findUniqueConfigurations(Core.countPieces(pieces), m.toInt, n.toInt)
-          .foldLeft(0) { (counter, conf) => {
-            if (counter % 1000000 == 0) {
-              println(s"Configuration # ${counter + 1}")
-              printConfigurations(n.toInt, m.toInt, conf)
-              println
+    case inputPattern(m, n, pieces, step, priority) =>
+      println(s"Dimension of the chess board: $m x $n")
+      val ic = Core.parsePieces(pieces)
+      println(s"Pieces: ${ic.mkString(", ")}")
+      val s = if (step.nonEmpty) step.toInt else 1
+      println(s"Step of log: one per $s")
+      val cp = Core.parsePriority(priority)
+      println(s"Priority of computation: ${drawPriorityQueue(cp)}")
+
+      measureTime {
+        val t: Int =
+          Core
+            .findUniqueConfigurations(ic, m.toInt, n.toInt, priorityQueue = cp)
+            .foldLeft(0) {
+              (counter, conf) => {
+                if (counter % s == 0) {
+                  println(s"Configuration # ${counter + 1}")
+                  printConfigurations(n.toInt, m.toInt, conf.pieces)
+                  println
+                }
+                counter + 1
+              }
             }
-            counter + 1
-            }
-          }
-      println(s"$t solutions")
+        println(s"Found: $t solutions")
       }
 
     case _ =>
@@ -33,21 +44,29 @@ object ChessChallengeApp extends App {
   }
 
 
-  def printConfigurations(rows: Int, columns: Int, conf: Seq[Piece]): Unit =
-    Core.generatePairs(rows, columns).foreach(p => {
+  private def printConfigurations(rows: Int, columns: Int, conf: Set[Piece]): Unit =
+    Board.getAllPossibleBoardPositions(rows, columns).foreach(p => {
       conf.find(piece => piece.m == p._1 && piece.n == p._2)
       match {
-        case Some(piece) => print(piece.p)
-        case _ => print('-')
+        case Some(piece) => print(s" ${piece.p} ")
+        case _ => print(" - ")
       }
       if (p._2 == columns) println()
     })
 
-  def time[R](block: => R): R = {
-    val t0 = System.nanoTime()
-    val result = block    // call-by-name
-    val t1 = System.nanoTime()
-    println("Elapsed time: " + (t1 - t0) + "ns")
+  @tailrec
+  private def drawPriorityQueue(in: Seq[Char], out: String = ""): String =
+    in.headOption match {
+      case Some(p) => drawPriorityQueue(in.tail,s"$out -> $p")
+      case None => out
+    }
+
+  private def measureTime[R](block: => R): R = {
+    val t0 = System.currentTimeMillis()
+    val result = block
+    val t1 = System.currentTimeMillis()
+    val elapsed = DurationLong(t1 - t0).millis
+    println(s"Elapsed time: $elapsed ms")
     result
   }
 }

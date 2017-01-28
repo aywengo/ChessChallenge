@@ -1,72 +1,48 @@
 package melnyk.co
 
-import melnyk.co.model.Piece
+import melnyk.co.model.{Board, Piece}
+
 import scala.annotation.tailrec
 
 object Core {
-  val priority: Seq[Char] = "QRBNK" // the order of calculation of combination
+  val defaultPriority: Seq[Char] = "QRBKN".toSeq // the order of calculation of combination
 
   @tailrec
-  def findUniqueConfigurations(inputMap:Map[Char, Int],
-                               rows: Int, columns: Int,
-                               accum: Iterator[Seq[Piece]] = Iterator.empty,
-                               priority: Seq[Char] = priority): Iterator[Seq[Piece]] =
-    priority.headOption match {
-      case None => // end of calculations
-        accum.filter(_.size == inputMap.values.sum)
-      case Some(piece) if inputMap.contains(piece) =>
-        val accumulator =
-          if (!accum.hasNext) { // first chess piece from priority queue
-            combinePieces(piece, inputMap, rows, columns)
-                .filter(k => checkForSafety(k))
-                .map(Some(_))
-          }
-          else
-            for {
-              accumulated: Seq[Piece] <- accum
-              combined: Seq[Piece] <- combinePieces(piece, inputMap, rows, columns)
-            } yield {
-              if (checkForSafety(combined, accumulated)) Some(accumulated ++ combined)
-              else None
-            }
-        findUniqueConfigurations(inputMap, rows, columns, accumulator.flatten, priority.tail)
+  def findUniqueConfigurations(pieces:Map[Char, Int], rows: Int, columns: Int,
+                               accumulatedPositions: Iterator[Board] = Iterator.empty,
+                               priorityQueue: Seq[Char] = defaultPriority): Iterator[Board] =
+    priorityQueue.headOption match {
+      case None =>
+        // end of calculations
+        accumulatedPositions
+          .filter(_.pieces.size == pieces.values.sum) // except incomplete boards
+      case Some(piece) if pieces.contains(piece) && accumulatedPositions.hasNext =>
+        // put new bunch of chess pieces and find safe chess board configurations
+        findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
+          accumulatedPositions = accumulatedPositions.flatMap(b => b.putFewPieces(piece.toString*pieces(piece))))
+      case Some(piece) if pieces.contains(piece) =>
+        // first chess piece from priority queue
+        findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
+          accumulatedPositions = Board(Set.empty[Piece],rows, columns)
+            .putFewPieces(piece.toString*pieces(piece)).toIterator)
       case _ =>
-        findUniqueConfigurations(inputMap, rows, columns, accum, priority.tail)
-  }
-
-
-  def combinePieces(p: Char, inputMap:Map[Char, Int], rows: Int, columns: Int): Iterator[Seq[Piece]] =
-    if (inputMap.contains(p))
-      generatePairs(rows, columns)
-        .toSeq.combinations(inputMap(p))
-        .map(i => i.map(j => Piece(p, j._1, j._2)))
-    else Iterator.empty
-
-
-  // extract all possible coordinates of positions
-  def generatePairs(rows: Int, columns: Int): Iterable[(Int,Int)] = {
-    for {
-      n <- 1 to columns
-      m <- 1 to rows
-    } yield (n,m)
+        // keep accumulatedPositions, move to next chess piece in priority queue
+        findUniqueConfigurations(pieces, rows, columns, accumulatedPositions, priorityQueue.tail)
   }
 
   // check whether pieces are in danger positions to each other
   @tailrec
-  def checkForSafety(in: Seq[Piece], add: Seq[Piece] = Seq.empty[Piece]): Boolean =
+  def checkForSafety(in: Seq[Piece]): Boolean =
     in.headOption match {
-      case Some(p1) if add.exists(p => p1.samePosition(p)) || in.tail.exists(p => !p1.isInSafe(p) || !p.isInSafe(p1)) => false
-      case Some(p1) if in.tail.nonEmpty && add.isEmpty => in.tail.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail)
-      case Some(p1) if in.tail.nonEmpty => add.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail, add)
-      case Some(p1) => add.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1))
-      case _ => false
+      case Some(p1) => in.tail.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail)
+      case _ => true
     }
 
-  // parsing of an input parameter
-  def countPieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
+  // parsing of an input parameter of pieces
+  def parsePieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
 
-  // two or more pieces on the same cell
-  def hasConflicts(in: Seq[Piece]): Boolean = in.map(k => (k.n, k.m)).distinct.size != in.size
-
+  // parsing of an input parameter of priority queue
+  def parsePriority(input: String): Seq[Char] =
+    if (input != null && input.distinct.length == 5) input.toSeq
+    else defaultPriority
 }
-
