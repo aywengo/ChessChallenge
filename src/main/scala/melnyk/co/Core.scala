@@ -30,14 +30,6 @@ object Core {
         findUniqueConfigurations(pieces, rows, columns, accumulatedPositions, priorityQueue.tail)
   }
 
-  // check whether pieces are in danger positions to each other
-  @tailrec
-  def checkForSafety(in: Seq[Piece]): Boolean =
-    in.headOption match {
-      case Some(p1) => in.tail.forall(p2 => p1.isInSafe(p2) && p2.isInSafe(p1)) && checkForSafety(in.tail)
-      case _ => true
-    }
-
   // parsing of an input parameter of pieces
   def parsePieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
 

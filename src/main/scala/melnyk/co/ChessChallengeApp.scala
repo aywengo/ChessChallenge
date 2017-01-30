@@ -48,7 +48,7 @@ object ChessChallengeApp extends App {
     Board.getAllPossibleBoardPositions(rows, columns).foreach(p => {
       conf.find(piece => piece.m == p._1 && piece.n == p._2)
       match {
-        case Some(piece) => print(s" ${piece.p} ")
+        case Some(piece) => print(s" ${piece.pieceSymbol} ")
         case _ => print(" - ")
       }
       if (p._2 == columns) println()

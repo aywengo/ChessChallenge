@@ -9,3 +9,17 @@ libraryDependencies ++=
     "org.scalacheck" %% "scalacheck" % "1.13.4" % "test")
 
 scalacOptions in Test ++= Seq("-Yrangepos")
+
+coverageMinimum := 50
+
+coverageFailOnMinimum := false
+
+coverageHighlighting := true
+
+coverageEnabled := true
+
+publishArtifact in Test := false
+
+parallelExecution in Test := false
+
+coverageExcludedPackages := "melnyk.co.ChessChallengeApp;"
