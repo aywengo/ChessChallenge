@@ -2,9 +2,9 @@
 
 ## Algorithm 
 
-The idea is simple: find unique board configuration putting pieces consequently by priority and count every single one if it's safe for every chess piece in set.
+The idea is simple: find unique board configurations putting pieces consequently according to priority and count every single one if it's safe for every chess piece in set.
  
-If put Queen onto empty 7x7 board, it lefts 19-25 safe positions for other pieces. 
+If put Queen onto empty 7x7 board, it lefts 19-25 unsafe positions for other pieces. 
 Accordingly: Rook: 13; Bishop: 7 - 13; Knight: 2 - 8; King: 4 - 8. 
 In this way, the amount of following iterations reduces drastically. That makes time of execution short. 
 
@@ -16,7 +16,7 @@ In this way, the amount of following iterations reduces drastically. That makes 
 - _priority_ - string representation of sequence of computation by type of chess piece. By default: QRBKN (optional) 
 
 ## Next steps:
-- since the sequence of combination is radial, iterations might be calculated in parallel. 
+- since the sequence of combination is radial, iterations might be calculated in parallel
 
 ## Tests and coverage 
 
