@@ -58,7 +58,7 @@ object ChessChallengeApp extends App {
   @tailrec
   private def drawPriorityQueue(in: Seq[Char], out: String = ""): String =
     in.headOption match {
-      case Some(p) => drawPriorityQueue(in.tail,s"$out -> $p")
+      case Some(p) => drawPriorityQueue(in.tail, s"$out -> $p")
       case None => out
     }
 
