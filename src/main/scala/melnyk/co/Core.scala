@@ -11,16 +11,16 @@ object Core {
   def findUniqueConfigurations(pieces: Map[Char, Int], rows: Int, columns: Int,
                                accumulatedPositions: Iterator[Board] = Iterator.empty,
                                priorityQueue: Seq[Char] = defaultPriority): Iterator[Board] =
-    priorityQueue.headOption match {
-      case None =>
+    priorityQueue match {
+      case Nil =>
         // end of calculations
         accumulatedPositions
           .filter(_.pieces.size == pieces.values.sum) // except incomplete boards
-      case Some(piece) if pieces.contains(piece) && accumulatedPositions.hasNext =>
+      case piece +: _ if pieces.contains(piece) && accumulatedPositions.hasNext =>
         // put new bunch of chess pieces and find safe chess board configurations
         findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
           accumulatedPositions = accumulatedPositions.flatMap(b => b.putFewPieces(piece.toString * pieces(piece))))
-      case Some(piece) if pieces.contains(piece) =>
+      case piece +: _ if pieces.contains(piece) =>
         // first chess piece from priority queue
         findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
           accumulatedPositions = Board(Set.empty[Piece], rows, columns)

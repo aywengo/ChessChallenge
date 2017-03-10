@@ -14,10 +14,10 @@ case class Board(pieces: Set[Piece], rows: Int, columns: Int, safe: Iterable[(In
 
   @tailrec
   final def putFewPieces(pieces: Seq[Char], acc: Set[Board] = Set.empty[Board]): Set[Board] = {
-    pieces.headOption match {
-      case Some(p) if acc.isEmpty => putFewPieces(pieces.tail, putNewPiece(p)) // first piece
-      case Some(p) => putFewPieces(pieces.tail, acc.flatMap(b => b.putNewPiece(p)))
-      case None => acc
+    pieces match {
+      case p +: _ if acc.isEmpty => putFewPieces(pieces.tail, putNewPiece(p)) // first piece
+      case p +: _ => putFewPieces(pieces.tail, acc.flatMap(b => b.putNewPiece(p)))
+      case Nil => acc
     }
   }
 }

@@ -41,7 +41,7 @@ object ChessChallengeApp extends App {
       println
       println(" For example: '7 7 KKQQBRN 1000000 QRBKN'")
       println("Means: 7 x 7 board 2 Kings, 2 Quins, 1 Rook, 1 Bishop, 1 kNight with stepping once in 100000 " +
-        "and with priority Quin->Rook->Bishop->kNight")
+        "and with priority Quin->Rook->Bishop->King->kNight")
   }
 
 
@@ -57,9 +57,9 @@ object ChessChallengeApp extends App {
 
   @tailrec
   private def drawPriorityQueue(in: Seq[Char], out: String = ""): String =
-    in.headOption match {
-      case Some(p) => drawPriorityQueue(in.tail, s"$out -> $p")
-      case None => out
+    in match {
+      case p +: tail => drawPriorityQueue(tail, s"$out -> $p")
+      case Nil => out
     }
 
   private def measureTime[R](block: => R): R = {
