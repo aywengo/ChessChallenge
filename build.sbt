@@ -16,7 +16,7 @@ coverageFailOnMinimum := false
 
 coverageHighlighting := true
 
-coverageEnabled := false
+coverageEnabled := true
 
 publishArtifact in Test := false
 

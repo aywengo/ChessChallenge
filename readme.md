@@ -20,7 +20,7 @@ In this way, the amount of following iterations reduces drastically. That makes 
 
 ## Tests and coverage 
 
-In order to run tests with coverage use following commands:
+In order to run tests with coverage allow coverage in build.sbt (set coverageEnabled := true) and use following commands:
 `$ sbt clean coverage test`
 `$ sbt coverageReport`
 
