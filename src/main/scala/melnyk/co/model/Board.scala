@@ -8,7 +8,7 @@ case class Board (pieces: Set[Piece], rows:Int, columns:Int, safe: Iterable[(Int
     safe
       .map(op => Piece(p, op._1, op._2))
       .filter(np => pieces.forall(_.isInSafeFrom(np))) // existing pieces should remain being in safe positions
-      .map(np => Board(pieces ++ Seq(np),rows, columns,
+      .map(np => Board(pieces + np,rows, columns,
         safe = safe.filter(pos => np.isSafeFor(pos._1, pos._2)))) // filter unsafe positions form the safe list
       .toSet // new Board should be unique this is why they're presented as Set
 

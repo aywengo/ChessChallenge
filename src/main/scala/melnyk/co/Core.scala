@@ -31,7 +31,7 @@ object Core {
   }
 
   // parsing of an input parameter of pieces
-  def parsePieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).map(e => e._1 -> e._2.length)
+  def parsePieces(input: String): Map[Char, Int] = input.groupBy(c => c.toUpper).mapValues(_.length)
 
   // parsing of an input parameter of priority queue
   def parsePriority(input: String): Seq[Char] =

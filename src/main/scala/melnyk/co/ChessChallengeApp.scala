@@ -9,7 +9,7 @@ object ChessChallengeApp extends App {
   val inputPattern = """(\d+)\s*(\d+)\s*([KQBRN]+)\s*(\d*)?\s*([KQBRN]{5})?""".r
 
   args.mkString(" ") match {
-    case inputPattern(m, n, pieces, step, priority) =>
+    case inputPattern(m, n, pieces, step, priority) if step.toInt > 0 =>
       println(s"Dimension of the chess board: $m x $n")
       val ic = Core.parsePieces(pieces)
       println(s"Pieces: ${ic.mkString(", ")}")
@@ -37,10 +37,11 @@ object ChessChallengeApp extends App {
 
     case _ =>
       println("The expected input is:")
-      println(" M N [pieces]")
+      println(" M N pieces [step] [priority]")
       println
-      println(" For example: '7 7 KKQQBRN'")
-      println("Means: 7 x 7 board 2 Kings, 2 Quins, 1 Rook, 1 Bishop, 1 kNight")
+      println(" For example: '7 7 KKQQBRN 1000000 QRBKN'")
+      println("Means: 7 x 7 board 2 Kings, 2 Quins, 1 Rook, 1 Bishop, 1 kNight with stepping once in 100000 " +
+        "and with priority Quin->Rook->Bishop->kNight")
   }
 
 
