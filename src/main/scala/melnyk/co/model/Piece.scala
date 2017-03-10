@@ -1,51 +1,53 @@
 package melnyk.co.model
 
-abstract class Piece(val pieceSymbol: Char, val n: Int, val m: Int) {
-  def sameRow(row: Int, column: Int): Boolean = n == row
+abstract class Piece(val pieceSymbol: Char, val position:Position) {
+  def sameRow(pos:Position): Boolean = position.row == pos.row
 
-  def sameColumn(row: Int, column: Int): Boolean = m == column
+  def sameColumn(pos:Position): Boolean = position.column == pos.column
 
-  def sameDiag(row: Int, column: Int): Boolean = (column - m).abs == (row - n).abs
+  def sameDiag(pos:Position): Boolean = (pos.column - position.column).abs == (pos.row - position.row).abs
 
-  def nextTo(row: Int, column: Int): Boolean = (column - m).abs <= 1 && (row - n).abs <= 1
+  def nextTo(pos:Position): Boolean = (pos.column - position.column).abs <= 1 && (pos.row - position.row).abs <= 1
 
-  def knightJump(row: Int, column: Int): Boolean =
-    ((column - m).abs, (row - n).abs) match {
+  def knightJump(pos:Position): Boolean =
+    ((pos.column - position.column).abs, (pos.row - position.row).abs) match {
       case (1, 2) | (2, 1) | (0, 0) => true
       case _ => false
     }
 
-  def isSafeFor(n: Int, m: Int): Boolean
+  def isSafeFor(position:Position): Boolean
 
-  def isInSafeFrom(piece: Piece): Boolean = piece.isSafeFor(this.n, this.m)
+  def isInSafeFrom(piece: Piece): Boolean = piece.isSafeFor(position)
 }
 
 object Piece {
-  def apply(p: Char, n: Int, m: Int): Piece = p match {
-    case 'Q' => Queen(n, m)
-    case 'R' => Rook(n, m)
-    case 'B' => Bishop(n, m)
-    case 'K' => King(n, m)
-    case 'N' => Knight(n, m)
+  def apply(p: Char, position:Position): Piece = p match {
+    case 'Q' => Queen(position)
+    case 'R' => Rook(position)
+    case 'B' => Bishop(position)
+    case 'K' => King(position)
+    case 'N' => Knight(position)
   }
 }
 
-case class Queen(row: Int, column: Int) extends Piece('Q', row, column) {
-  def isSafeFor(n: Int, m: Int): Boolean = !(sameRow(n, m) || sameColumn(n, m) || sameDiag(n, m))
+case class Queen(onPosition:Position) extends Piece('Q', onPosition) {
+  def isSafeFor(pos:Position): Boolean = !(sameRow(pos) || sameColumn(pos) || sameDiag(pos))
 }
 
-case class Rook(row: Int, column: Int) extends Piece('R', row, column) {
-  def isSafeFor(n: Int, m: Int): Boolean = !(sameRow(n, m) || sameColumn(n, m))
+case class Rook(onPosition:Position) extends Piece('R', onPosition) {
+  def isSafeFor(pos:Position): Boolean = !(sameRow(pos) || sameColumn(pos))
 }
 
-case class Bishop(row: Int, column: Int) extends Piece('B', row, column) {
-  def isSafeFor(n: Int, m: Int): Boolean = !sameDiag(n, m)
+case class Bishop(onPosition:Position) extends Piece('B', onPosition) {
+  def isSafeFor(pos:Position): Boolean = !sameDiag(pos)
 }
 
-case class King(row: Int, column: Int) extends Piece('K', row, column) {
-  def isSafeFor(n: Int, m: Int): Boolean = !nextTo(n, m)
+case class King(onPosition:Position) extends Piece('K', onPosition) {
+  def isSafeFor(pos:Position): Boolean = !nextTo(pos)
 }
 
-case class Knight(row: Int, column: Int) extends Piece('N', row, column) {
-  def isSafeFor(n: Int, m: Int): Boolean = !knightJump(n, m)
+case class Knight(onPosition:Position) extends Piece('N', onPosition) {
+  def isSafeFor(pos:Position): Boolean = !knightJump(pos)
 }
+
+case class Position(row: Int, column: Int)

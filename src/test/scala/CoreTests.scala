@@ -1,5 +1,5 @@
 import melnyk.co.Core
-import melnyk.co.model.Board
+import melnyk.co.model.{Board, Position}
 import org.scalatest.{FlatSpec, Matchers}
 
 class CoreTests extends FlatSpec with Matchers {
@@ -8,10 +8,10 @@ class CoreTests extends FlatSpec with Matchers {
 
     combinations should not be empty
     combinations.size shouldBe 4
-    combinations should contain(1, 1)
-    combinations should contain(1, 2)
-    combinations should contain(2, 1)
-    combinations should contain(2, 2)
+    combinations should contain(Position(1, 1))
+    combinations should contain(Position(1, 2))
+    combinations should contain(Position(2, 1))
+    combinations should contain(Position(2, 2))
   }
 
   it should "find unique 4 configurations for 3x3 board containing 2 Kings and 1 Rook" in {

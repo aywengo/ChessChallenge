@@ -47,12 +47,12 @@ object ChessChallengeApp extends App {
 
   private def printConfigurations(rows: Int, columns: Int, conf: Set[Piece]): Unit =
     Board.getAllPossibleBoardPositions(rows, columns).foreach(p => {
-      conf.find(piece => piece.m == p._1 && piece.n == p._2)
+      conf.find(piece => piece.position.column == p.column && piece.position.row == p.row)
       match {
         case Some(piece) => print(s" ${piece.pieceSymbol} ")
         case _ => print(" - ")
       }
-      if (p._2 == columns) println()
+      if (p.column == columns) println()
     })
 
   @tailrec
