@@ -9,11 +9,11 @@ object ChessChallengeApp extends App {
   val inputPattern = """(\d+)\s*(\d+)\s*([KQBRN]+)\s*(\d*)?\s*([KQBRN]{5})?""".r
 
   args.mkString(" ") match {
-    case inputPattern(m, n, pieces, step, priority) if step.toInt > 0 =>
+    case inputPattern(m, n, pieces, step, priority) =>
       println(s"Dimension of the chess board: $m x $n")
       val ic = Core.parsePieces(pieces)
       println(s"Pieces: ${ic.mkString(", ")}")
-      val s = if (step.nonEmpty) step.toInt else 1
+      val s = if (step.nonEmpty && step.toInt > 0) step.toInt else 1
       println(s"Step of log: one per $s")
       val cp = Core.parsePriority(priority)
       println(s"Priority of computation: ${drawPriorityQueue(cp)}")
