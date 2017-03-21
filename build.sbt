@@ -6,7 +6,8 @@ libraryDependencies ++=
   Seq(
     "org.scalactic" %% "scalactic" % "3.0.1",
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.13.4" % "test")
+    "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
+  )
 
 scalacOptions in Test ++= Seq("-Yrangepos")
 

@@ -13,7 +13,25 @@ In this way, the amount of following iterations reduces drastically. That makes 
 - _n_ - amount of columns (required)
 - _pieces_ - string representation of chess pieces. (required)
 - _step_ - step of logs. By default: 1. (optional)
-- _priority_ - string representation of sequence of computation by type of chess piece. By default: QRBKN (optional) 
+- _Priority_ - string representation of sequence of computation by type of chess piece. By default: QRBKN (optional) 
+
+## Scala style checker
+`$ sbt scalaatyle`
+
+*Output:*
+
+```
+[info] scalastyle using config /Users/romeo/Repository/chessChallenge/scalastyle-config.xml
+[warn] /Users/romeo/Repository/chessChallenge/src/main/scala/melnyk/co/Core.scala:60:17: Avoid using null
+[warn] /Users/romeo/Repository/chessChallenge/src/main/scala/melnyk/co/Core.scala:60:4: If block needs braces
+[info] Processed 4 file(s)
+[info] Found 0 errors
+[info] Found 2 warnings
+[info] Found 0 infos
+[info] Finished in 2 ms
+[success] created output: /Users/romeo/Repository/chessChallenge/target
+[success] Total time: 0 s, completed 21 бер. 2017 21:57:48
+```
 
 ## Next steps:
 - since the sequence of combination is radial, iterations might be calculated in parallel
