@@ -41,7 +41,7 @@ object Core {
       case piece +: _ if pieces.contains(piece) && accumulatedPositions.hasNext =>
         // put new bunch of chess pieces and find safe chess board configurations
         findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
-          accumulatedPositions = accumulatedPositions.flatMap(b => b.putFewPieces(piece.toString * pieces(piece))))
+          accumulatedPositions = accumulatedPositions.flatMap(_.putFewPieces(piece.toString * pieces(piece))))
       case piece +: _ if pieces.contains(piece) =>
         // first chess piece from priority queue
         findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
@@ -56,7 +56,12 @@ object Core {
   def parsePieces(input: String): Map[Char, Int] = input.groupBy(_.toUpper).mapValues(_.length)
 
   // parsing of an input parameter of priority queue
-  def parsePriority(input: String): Seq[Char] =
-    if (input != null && input.distinct.length == 5) input.toSeq
-    else defaultPriority
+  def parsePriority(input: String): Seq[Char] = {
+    if (input != null && input.distinct.length == 5) {
+      input.toSeq
+    }
+    else {
+      defaultPriority
+    }
+  }
 }

@@ -54,7 +54,6 @@ object Board {
       m <- 1 to columns
     } yield Position(n, m)
 
-
   def extractSafePositions(pieces: Set[Piece], rows: Int, columns: Int): Iterable[Position] =
     Board.getAllPossibleBoardPositions(rows, columns)
       .filter(gp => pieces.forall(_.isSafeFor(gp))) // skip danger positions

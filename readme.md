@@ -16,7 +16,7 @@ In this way, the amount of following iterations reduces drastically. That makes 
 - _Priority_ - string representation of sequence of computation by type of chess piece. By default: QRBKN (optional) 
 
 ## Scala style checker
-`$ sbt scalaatyle`
+`$ sbt scalastyle`
 
 *Output:*
 
