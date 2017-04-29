@@ -1,6 +1,6 @@
 name := "ChessChallenge"
 version := "1.0"
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.2"
 
 libraryDependencies ++=
   Seq(
@@ -24,3 +24,13 @@ publishArtifact in Test := false
 parallelExecution in Test := false
 
 coverageExcludedPackages := "melnyk.co.ChessChallengeApp;"
+
+// workaround for running latest scalafmt 0.7.0-RC1
+def latestScalafmt = "0.7.0-RC1"
+commands += Command.args("scalafmt", "Run scalafmt cli.") {
+  case (state, args) =>
+    val Right(scalafmt) =
+      org.scalafmt.bootstrap.ScalafmtBootstrap.fromVersion(latestScalafmt)
+    scalafmt.main("--non-interactive" +: args.toArray)
+    state
+}

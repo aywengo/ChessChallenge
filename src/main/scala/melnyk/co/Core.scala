@@ -30,9 +30,13 @@ object Core {
   val defaultPriority: Seq[Char] = "QRBKN".toSeq // the order of calculation of combinations
 
   @tailrec
-  def findUniqueConfigurations(pieces: Map[Char, Int], rows: Int, columns: Int,
-                               accumulatedPositions: Iterator[Board] = Iterator.empty,
-                               priorityQueue: Seq[Char] = defaultPriority): Iterator[Board] =
+  def findUniqueConfigurations(
+      pieces: Map[Char, Int],
+      rows: Int,
+      columns: Int,
+      accumulatedPositions: Iterator[Board] = Iterator.empty,
+      priorityQueue: Seq[Char] = defaultPriority
+  ): Iterator[Board] =
     priorityQueue match {
       case Nil =>
         // end of calculations
@@ -40,13 +44,24 @@ object Core {
           .filter(_.pieces.size == pieces.values.sum) // except incomplete boards
       case piece +: _ if pieces.contains(piece) && accumulatedPositions.hasNext =>
         // put new bunch of chess pieces and find safe chess board configurations
-        findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
-          accumulatedPositions = accumulatedPositions.flatMap(_.putFewPieces(piece.toString * pieces(piece))))
+        findUniqueConfigurations(
+          pieces,
+          rows,
+          columns,
+          priorityQueue = priorityQueue.tail,
+          accumulatedPositions = accumulatedPositions.flatMap(_.putFewPieces(piece.toString * pieces(piece)))
+        )
       case piece +: _ if pieces.contains(piece) =>
         // first chess piece from priority queue
-        findUniqueConfigurations(pieces, rows, columns, priorityQueue = priorityQueue.tail,
+        findUniqueConfigurations(
+          pieces,
+          rows,
+          columns,
+          priorityQueue = priorityQueue.tail,
           accumulatedPositions = Board(Set.empty[Piece], rows, columns)
-            .putFewPieces(piece.toString * pieces(piece)).toIterator)
+            .putFewPieces(piece.toString * pieces(piece))
+            .toIterator
+        )
       case _ =>
         // keep accumulatedPositions, move to next chess piece in priority queue
         findUniqueConfigurations(pieces, rows, columns, accumulatedPositions, priorityQueue.tail)
@@ -56,12 +71,10 @@ object Core {
   def parsePieces(input: String): Map[Char, Int] = input.groupBy(_.toUpper).mapValues(_.length)
 
   // parsing of an input parameter of priority queue
-  def parsePriority(input: String): Seq[Char] = {
+  def parsePriority(input: String): Seq[Char] =
     if (input != null && input.distinct.length == 5) {
       input.toSeq
-    }
-    else {
+    } else {
       defaultPriority
     }
-  }
 }

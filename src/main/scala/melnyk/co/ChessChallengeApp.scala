@@ -44,8 +44,8 @@ object ChessChallengeApp extends App {
         val t: Int =
           Core
             .findUniqueConfigurations(ic, m.toInt, n.toInt, priorityQueue = cp)
-            .foldLeft(0) {
-              (counter, conf) => {
+            .foldLeft(0) { (counter, conf) =>
+              {
                 if (counter % s == 0) {
                   println(s"Configuration # ${counter + 1}")
                   printConfigurations(n.toInt, m.toInt, conf.pieces)
@@ -62,20 +62,22 @@ object ChessChallengeApp extends App {
       println(" M N pieces [step] [priority]")
       println
       println(" For example: '7 7 KKQQBRN 1000000 QRBKN'")
-      println("Means: 7 x 7 board 2 Kings, 2 Quins, 1 Rook, 1 Bishop, 1 kNight with stepping once in 100000 " +
-        "and with priority Quin->Rook->Bishop->King->kNight")
+      println(
+        "Means: 7 x 7 board 2 Kings, 2 Quins, 1 Rook, 1 Bishop, 1 kNight with stepping once in 100000 " +
+          "and with priority Quin->Rook->Bishop->King->kNight"
+      )
   }
 
-
   private def printConfigurations(rows: Int, columns: Int, conf: Set[Piece]): Unit =
-    Board.getAllPossibleBoardPositions(rows, columns).foreach(p => {
-      conf.find(piece => piece.position.column == p.column && piece.position.row == p.row)
-      match {
-        case Some(piece) => print(s" ${piece.pieceSymbol} ")
-        case _ => print(" - ")
-      }
-      if (p.column == columns) println()
-    })
+    Board
+      .getAllPossibleBoardPositions(rows, columns)
+      .foreach(p => {
+        conf.find(piece => piece.position.column == p.column && piece.position.row == p.row) match {
+          case Some(piece) => print(s" ${piece.pieceSymbol} ")
+          case _ => print(" - ")
+        }
+        if (p.column == columns) println()
+      })
 
   @tailrec
   private def drawPriorityQueue(in: Seq[Char], out: String = ""): String =

@@ -30,8 +30,7 @@ case class Board(pieces: Set[Piece], rows: Int, columns: Int, safe: Iterable[Pos
     safe
       .map(op => Piece(p, op))
       .filter(np => pieces.forall(_.isInSafeFrom(np))) // existing pieces should remain being in safe positions
-      .map(np => Board(pieces + np, rows, columns,
-        safe = safe.filter(pos => np.isSafeFor(pos)))) // filter unsafe positions form the safe list
+      .map(np => Board(pieces + np, rows, columns, safe = safe.filter(pos => np.isSafeFor(pos)))) // filter unsafe positions form the safe list
       .toSet // new Board should be unique this is why they're presented as Set
 
   @tailrec
@@ -55,6 +54,7 @@ object Board {
     } yield Position(n, m)
 
   def extractSafePositions(pieces: Set[Piece], rows: Int, columns: Int): Iterable[Position] =
-    Board.getAllPossibleBoardPositions(rows, columns)
+    Board
+      .getAllPossibleBoardPositions(rows, columns)
       .filter(gp => pieces.forall(_.isSafeFor(gp))) // skip danger positions
 }
